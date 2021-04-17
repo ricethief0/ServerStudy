@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 namespace ServerCore
 {
+    
     public class Listener
     {
         static Socket m_listenSocket;
-        Action<Socket> m_OnAcceptHandler;
+        Func<Session> m_sessionFactory;
 
-        public void Init(IPEndPoint endPoint, Action<Socket> onAcceptHandler)
+        public void Init(IPEndPoint endPoint, Func<Session> sessionFactory)
         {
-            m_OnAcceptHandler += onAcceptHandler;
+            m_sessionFactory += sessionFactory;
 
             m_listenSocket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
@@ -22,13 +24,24 @@ namespace ServerCore
             arg.Completed += new EventHandler<SocketAsyncEventArgs>(OnComplete);
             RegisterAccept(arg);
         }
+        void RegisterAccept(SocketAsyncEventArgs arg)
+        {
+            arg.AcceptSocket = null;
 
+            bool pending = m_listenSocket.AcceptAsync(arg);
+            if (pending == false)
+            {
+                OnComplete(null, arg);
+            }
+        }
         void OnComplete(object sender, SocketAsyncEventArgs arg)
         {
             if(SocketError.Success == arg.SocketError)
             {
-                m_OnAcceptHandler.Invoke(arg.AcceptSocket);
-
+                Session session = m_sessionFactory.Invoke();
+                session.Start(arg.AcceptSocket);
+                session.OnConnected(arg.RemoteEndPoint);
+                
             }
             else
             {
@@ -37,16 +50,7 @@ namespace ServerCore
             RegisterAccept(arg);
         }
 
-        void RegisterAccept(SocketAsyncEventArgs arg)
-        {
-            arg.AcceptSocket = null;
-
-            bool pending = m_listenSocket.AcceptAsync(arg);
-            if(pending == false)
-            {
-                OnComplete(null,arg);
-            }
-        }
+       
 
     }
 }

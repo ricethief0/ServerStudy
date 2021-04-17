@@ -1,32 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 
 namespace ServerCore
 {
-    public class Session
+   abstract public class Session
     {
         Socket m_socket;
         int mutex = 0;
         Queue<byte[]> sendQue = new Queue<byte[]>();
-        //bool m_isPending = false;
         List<ArraySegment<byte>> m_penddingList = new List<ArraySegment<byte>>();
         SocketAsyncEventArgs m_sendArgs = new SocketAsyncEventArgs();
         SocketAsyncEventArgs m_recArgs = new SocketAsyncEventArgs();
         object m_lock = new object();
+
+        abstract public void OnConnected(EndPoint endPoint);
+        abstract public void OnSend(int numOfBytes);
+        abstract public void OnReceive(ArraySegment<byte> buffers);
+        abstract public void OnDisConnected(EndPoint endPoint);
+
         public void Start(Socket socket)
         {
             m_socket = socket;
-
            
             m_recArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnRecevComplete);
             m_recArgs.SetBuffer(new byte[1024], 0, 1024);
             RegisterRecev();
 
             m_sendArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnSendCompelte);
-
         }
         public void Send(byte[] buff)
         {
@@ -46,6 +50,7 @@ namespace ServerCore
             if (Interlocked.Exchange(ref mutex, 1) == 1)
                 return;
 
+            OnDisConnected(m_socket.RemoteEndPoint);
             m_socket.Shutdown(SocketShutdown.Both);
             m_socket.Close();
         }
@@ -77,6 +82,8 @@ namespace ServerCore
                     {
                         m_sendArgs.BufferList = null;
                         m_penddingList.Clear();
+
+                        OnSend(m_sendArgs.BytesTransferred);
                         if (sendQue.Count > 0)
                         {
                             RegisterSend();
@@ -113,9 +120,7 @@ namespace ServerCore
             {
                 try
                 {
-                    string recData = Encoding.UTF8.GetString(arg.Buffer, arg.Offset, arg.BytesTransferred);
-
-                    Console.WriteLine($"[Client Data] : {recData}");
+                    OnReceive(new ArraySegment<byte>(arg.Buffer, arg.Offset, arg.BytesTransferred));
                     RegisterRecev();
                 }
                 catch (Exception ex)
