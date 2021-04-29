@@ -7,34 +7,50 @@ using ServerCore;
 
 namespace Server 
 {
+    public class Kight
+    {
+        public int m_hp;
+        public int m_atk;
+    }
     public class GameSession : Session
     {
         public override void OnConnected(EndPoint endPoint)
         {
-            //Console.WriteLine($"OnConnected : {endPoint}");
+            Console.WriteLine($"OnConnected : {endPoint}");
 
-            byte[] buff = Encoding.UTF8.GetBytes("Welcome Client, My name is Server");
-            Send(buff);
+            Kight kight = new Kight() { m_hp = 100, m_atk = 10 };
+
+            ArraySegment<byte> openSegment = SendBufferHelper.Open(4096);
+
+            byte[] buffer1 = BitConverter.GetBytes(kight.m_atk);
+            byte[] buffer2 = BitConverter.GetBytes(kight.m_hp);
+
+            Array.Copy(buffer1, 0, openSegment.Array, openSegment.Offset, buffer1.Length);
+            Array.Copy(buffer2, 0, openSegment.Array, openSegment.Offset+buffer1.Length, buffer2.Length);
+            ArraySegment<byte> sendbuufer = SendBufferHelper.Close(buffer1.Length + buffer2.Length);
+
+            Send(sendbuufer);
             Thread.Sleep(1000);
             DisConnect();
         }
 
         public override void OnDisConnected(EndPoint endPoint)
         {
-            //Console.WriteLine($"OnDisConnected : {endPoint}");
+            Console.WriteLine($"OnDisConnected : {endPoint}");
         }
 
-        public override void OnReceive(ArraySegment<byte> buffers)
+        public override int OnReceive(ArraySegment<byte> buffers)
         {
             string recData = Encoding.UTF8.GetString(buffers.Array, buffers.Offset, buffers.Count);
 
             Console.WriteLine($"[Client Data] : {recData}");
+            return buffers.Count;
         }
 
 
         public override void OnSend(int numOfBytes)
         {
-            //Console.WriteLine($"Send Transferred bytes : {numOfBytes}");
+            Console.WriteLine($"Send Transferred bytes : {numOfBytes}");
         }
     }
     class Program

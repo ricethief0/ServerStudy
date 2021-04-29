@@ -11,7 +11,10 @@ namespace ServerCore
     {
         Socket m_socket;
         int mutex = 0;
-        Queue<byte[]> sendQue = new Queue<byte[]>();
+        RecvBuffer m_recvBuffer = new RecvBuffer(1024);
+
+
+        Queue<ArraySegment<byte>> sendQue = new Queue<ArraySegment<byte>>();
         List<ArraySegment<byte>> m_penddingList = new List<ArraySegment<byte>>();
         SocketAsyncEventArgs m_sendArgs = new SocketAsyncEventArgs();
         SocketAsyncEventArgs m_recArgs = new SocketAsyncEventArgs();
@@ -19,7 +22,7 @@ namespace ServerCore
 
         abstract public void OnConnected(EndPoint endPoint);
         abstract public void OnSend(int numOfBytes);
-        abstract public void OnReceive(ArraySegment<byte> buffers);
+        abstract public int OnReceive(ArraySegment<byte> buffers);
         abstract public void OnDisConnected(EndPoint endPoint);
 
         public void Start(Socket socket)
@@ -27,12 +30,10 @@ namespace ServerCore
             m_socket = socket;
            
             m_recArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnRecevCompleted);
-            m_recArgs.SetBuffer(new byte[1024], 0, 1024);
-            RegisterRecev();
-
             m_sendArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnSendCompelted);
+            RegisterRecev();
         }
-        public void Send(byte[] buff)
+        public void Send(ArraySegment<byte> buff)
         {
             lock(m_lock)
             {
@@ -60,8 +61,8 @@ namespace ServerCore
         {
             while(sendQue.Count>0)
             {
-                byte[] buff = sendQue.Dequeue();
-                m_penddingList.Add(new ArraySegment<byte>(buff, 0, buff.Length));
+                ArraySegment<byte> buff = sendQue.Dequeue();
+                m_penddingList.Add(buff);
             }
             m_sendArgs.BufferList = m_penddingList;
 
@@ -105,6 +106,10 @@ namespace ServerCore
 
         void RegisterRecev()
         {
+            m_recvBuffer.Clean();
+            ArraySegment<byte> sg = m_recvBuffer.WriteSegment;
+            m_recArgs.SetBuffer(sg.Array,sg.Offset,sg.Count);
+
            bool pending =  m_socket.ReceiveAsync(m_recArgs);
             if(pending == false)
             {
@@ -120,7 +125,26 @@ namespace ServerCore
             {
                 try
                 {
-                    OnReceive(new ArraySegment<byte>(arg.Buffer, arg.Offset, arg.BytesTransferred));
+                    // 쓰기에 버퍼 이동
+                    if(!m_recvBuffer.OnWrite(arg.BytesTransferred)) 
+                    {
+                        DisConnect(); 
+                        return; 
+                    }
+                    //컨텐츠 쪽으로 데이터를 넘겨주고 얼마나 처리했는지 받는다. 
+                    int processLen = OnReceive(m_recvBuffer.ReadSegment);
+                    if (processLen < 0 || processLen > m_recvBuffer.DataSize)
+                    {
+                        DisConnect();
+                        return;
+                    }
+
+                    //읽기에 버퍼 이동
+                    if (!m_recvBuffer.OnRead(processLen))
+                    {
+                        DisConnect();
+                        return;
+                    }
                     RegisterRecev();
                 }
                 catch (Exception ex)

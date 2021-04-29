@@ -11,7 +11,7 @@ namespace DummyClient
     {
         public override void OnConnected(EndPoint endPoint)
         {
-            //Console.WriteLine($"OnConnected : {endPoint}");
+            Console.WriteLine($"OnConnected : {endPoint}");
             // 보내기 위함
             for (int i = 0; i < 5; i++)
             {
@@ -21,20 +21,21 @@ namespace DummyClient
 
         public override void OnDisConnected(EndPoint endPoint)
         {
-            //Console.WriteLine($"OnDisConnected : {endPoint}");
+            Console.WriteLine($"OnDisConnected : {endPoint}");
         }
 
-        public override void OnReceive(ArraySegment<byte> buffers)
+        public override int OnReceive(ArraySegment<byte> buffers)
         {
             string recData = Encoding.UTF8.GetString(buffers.Array, buffers.Offset, buffers.Count);
 
             Console.WriteLine($"[From Server] : {recData}");
+            return buffers.Count;
         }
 
 
         public override void OnSend(int numOfBytes)
         {
-            //Console.WriteLine($"Send Transferred bytes : {numOfBytes}");
+            Console.WriteLine($"Send Transferred bytes : {numOfBytes}");
         }
     }
 
