@@ -21,7 +21,7 @@ namespace ServerCore
             m_listenSocket.Listen(10);
 
             SocketAsyncEventArgs arg = new SocketAsyncEventArgs();
-            arg.Completed += new EventHandler<SocketAsyncEventArgs>(OnComplete);
+            arg.Completed += new EventHandler<SocketAsyncEventArgs>(OnAcceptCompleted);
             RegisterAccept(arg);
         }
         void RegisterAccept(SocketAsyncEventArgs arg)
@@ -31,10 +31,10 @@ namespace ServerCore
             bool pending = m_listenSocket.AcceptAsync(arg);
             if (pending == false)
             {
-                OnComplete(null, arg);
+                OnAcceptCompleted(null, arg);
             }
         }
-        void OnComplete(object sender, SocketAsyncEventArgs arg)
+        void OnAcceptCompleted(object sender, SocketAsyncEventArgs arg)
         {
             if(SocketError.Success == arg.SocketError)
             {

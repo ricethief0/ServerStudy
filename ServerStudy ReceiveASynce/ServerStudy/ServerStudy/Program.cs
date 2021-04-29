@@ -3,15 +3,16 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using ServerCore;
 
-namespace ServerCore
+namespace Server 
 {
     public class GameSession : Session
     {
         public override void OnConnected(EndPoint endPoint)
         {
             //Console.WriteLine($"OnConnected : {endPoint}");
-            
+
             byte[] buff = Encoding.UTF8.GetBytes("Welcome Client, My name is Server");
             Send(buff);
             Thread.Sleep(1000);
@@ -39,7 +40,7 @@ namespace ServerCore
     class Program
     {
         static Listener listener = new Listener();
-        
+
 
         static void Main(string[] args)
         {
@@ -50,9 +51,9 @@ namespace ServerCore
 
             listener.Init(endPoint, () => { return new GameSession(); });
             Console.WriteLine("Waiting...");
-            while(true)
+            while (true)
             {; }
-            
+
 
 
 

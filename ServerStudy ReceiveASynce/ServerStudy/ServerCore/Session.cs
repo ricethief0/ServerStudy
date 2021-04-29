@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace ServerCore
 {
-   abstract public class Session
+    public abstract class Session
     {
         Socket m_socket;
         int mutex = 0;
@@ -26,11 +26,11 @@ namespace ServerCore
         {
             m_socket = socket;
            
-            m_recArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnRecevComplete);
+            m_recArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnRecevCompleted);
             m_recArgs.SetBuffer(new byte[1024], 0, 1024);
             RegisterRecev();
 
-            m_sendArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnSendCompelte);
+            m_sendArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnSendCompelted);
         }
         public void Send(byte[] buff)
         {
@@ -68,11 +68,11 @@ namespace ServerCore
             bool pending = m_socket.SendAsync(m_sendArgs);
             if (pending == false)
             {
-                OnSendCompelte(null, m_sendArgs);
+                OnSendCompelted(null, m_sendArgs);
             }
         }
 
-        void OnSendCompelte(object obj, SocketAsyncEventArgs arg)
+        void OnSendCompelted(object obj, SocketAsyncEventArgs arg)
         {
             lock(m_lock)
             {
@@ -108,12 +108,12 @@ namespace ServerCore
            bool pending =  m_socket.ReceiveAsync(m_recArgs);
             if(pending == false)
             {
-                OnRecevComplete(null, m_recArgs);
+                OnRecevCompleted(null, m_recArgs);
             }
         }
 
        
-        void OnRecevComplete(object sender, SocketAsyncEventArgs arg)
+        void OnRecevCompleted(object sender, SocketAsyncEventArgs arg)
         {
 
             if (arg.BytesTransferred > 0 && SocketError.Success == arg.SocketError)
