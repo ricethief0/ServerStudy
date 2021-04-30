@@ -101,7 +101,7 @@ class {0}  //body
             }}
         }}
 
-        public List<{0}> {1]s = new List<{0}>();
+        public List<{0}> {1}s = new List<{0}>();
 
 ";
 
