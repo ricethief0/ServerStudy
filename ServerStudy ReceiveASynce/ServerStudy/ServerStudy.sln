@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.809.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "ServerStudy\Server.csproj", "{144F78D3-DCC5-490C-9687-1499A59FF8F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DummyClient", "DummyClient\DummyClient.csproj", "{A65F9143-8C4E-493B-BFE2-5800F2456FC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DummyClient", "DummyClient\DummyClient.csproj", "{A65F9143-8C4E-493B-BFE2-5800F2456FC7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerCore", "ServerCore\ServerCore.csproj", "{3E67C831-B65C-48EC-B79E-469E1FCACA8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerCore", "ServerCore\ServerCore.csproj", "{3E67C831-B65C-48EC-B79E-469E1FCACA8C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PacketGenerator", "PacketGenerator\PacketGenerator.csproj", "{4B597A81-96A5-4899-B51B-EF8A7473978D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PacketGenerator", "PacketGenerator\PacketGenerator.csproj", "{4B597A81-96A5-4899-B51B-EF8A7473978D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{253FABE7-24A0-4044-A68C-80F8D7889A24}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csproj", "{B61E03DA-F2C3-4D58-926E-D97542E64268}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{144F78D3-DCC5-490C-9687-1499A59FF8F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{144F78D3-DCC5-490C-9687-1499A59FF8F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{144F78D3-DCC5-490C-9687-1499A59FF8F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{144F78D3-DCC5-490C-9687-1499A59FF8F5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A65F9143-8C4E-493B-BFE2-5800F2456FC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A65F9143-8C4E-493B-BFE2-5800F2456FC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A65F9143-8C4E-493B-BFE2-5800F2456FC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -35,9 +31,16 @@ Global
 		{4B597A81-96A5-4899-B51B-EF8A7473978D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4B597A81-96A5-4899-B51B-EF8A7473978D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4B597A81-96A5-4899-B51B-EF8A7473978D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B61E03DA-F2C3-4D58-926E-D97542E64268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B61E03DA-F2C3-4D58-926E-D97542E64268}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B61E03DA-F2C3-4D58-926E-D97542E64268}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B61E03DA-F2C3-4D58-926E-D97542E64268}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4B597A81-96A5-4899-B51B-EF8A7473978D} = {253FABE7-24A0-4044-A68C-80F8D7889A24}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {71B61DFB-2161-4A92-84BC-1579A002AA7A}
@@ -48,8 +51,5 @@ Global
 		$1.DirectoryNamespaceAssociation = PrefixedHierarchical
 		$0.StandardHeader = $2
 		$0.VersionControlPolicy = $3
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{4B597A81-96A5-4899-B51B-EF8A7473978D} = {253FABE7-24A0-4044-A68C-80F8D7889A24}
 	EndGlobalSection
 EndGlobal

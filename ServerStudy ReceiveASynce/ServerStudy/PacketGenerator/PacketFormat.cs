@@ -31,7 +31,7 @@ public enum PacketID
         // {3} 멤버 변수 Write
         public static string packetFormat =
 @"
-class {0}  //body
+public class {0}  //body
 {{
     {1}
 
@@ -85,23 +85,23 @@ class {0}  //body
 
         public static string memberListFormat =
 @"
- public class {0}
-        {{
-            {2}
+public class {0}
+{{
+    {2}
 
-            public void Read(ReadOnlySpan<byte> span, ref ushort count)
-            {{
-                {3}
-            }}
-            public bool Write(Span<byte> span, ref ushort count)
-            {{
-                bool success = true;
-                {4}
-                return success;
-            }}
-        }}
+    public void Read(ReadOnlySpan<byte> span, ref ushort count)
+    {{
+        {3}
+    }}
+    public bool Write(Span<byte> span, ref ushort count)
+    {{
+        bool success = true;
+        {4}
+        return success;
+    }}
+}}
 
-        public List<{0}> {1}s = new List<{0}>();
+public List<{0}> {1}s = new List<{0}>();
 
 ";
 
@@ -115,8 +115,8 @@ class {0}  //body
         // {0} 변수 이름
         // {1} 변수 형식
         public static string readByteFormat =
-@"this.{0} = ({1})segment.Array[sg.Offset + count];
-count += sizeof({1})";
+@"this.{0} = ({1})sg.Array[sg.Offset + count];
+count += sizeof({1});";
 
         //{0] 변수이름
         public static string readStringFormat =
@@ -149,8 +149,8 @@ count += sizeof({1});";
         // {0} 변수 이름
         // {1} 변수 형식
         public static string writeByteFormat =
-@"segment.Array[sg.Offset + count] = ({1})this.{0};
-count += sizeof({1})";
+@"sg.Array[sg.Offset + count] = ({1})this.{0};
+count += sizeof({1});";
 
         //{0} 변수이름
         public static string writeStringFormat =
