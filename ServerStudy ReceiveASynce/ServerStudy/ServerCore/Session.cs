@@ -7,6 +7,44 @@ using System.Threading;
 
 namespace ServerCore
 {
+    public abstract class PacketSession : Session
+    {
+        public static readonly int HeaderSize = 2;
+        //sealed 키워드 : cpp에서 상속시 접근제어에 private 으로 해놓은거나 마찬가지이다.
+        // ex) class PacketSession : private Session{}
+        public sealed override int OnReceive(ArraySegment<byte> buffers)
+        {
+            int processLen = 0;
+
+            while(true)
+            {
+                //최소한 헤더는 파싱할수있는지 패킷사이즈로 확인
+                if (buffers.Count < HeaderSize)
+                    break;
+
+                //패킷이 완전체로 도착했는지 확인 
+                ushort dataSize = BitConverter.ToUInt16(buffers.Array, buffers.Offset);
+                if (buffers.Count > dataSize) // 패킷사이즈가 실제 들어온 버퍼 사이즈보다 작으면 말이 안되니 브레이크
+                    break;
+
+                //패킷조립가능
+                OnRecvPacket(buffers);
+
+                processLen += dataSize;
+                buffers = new ArraySegment<byte>(buffers.Array, buffers.Offset + dataSize, buffers.Count - dataSize);
+
+            }
+
+            return processLen;
+        }
+
+        public abstract void OnRecvPacket(ArraySegment<byte> buffers);
+    }
+
+        
+    
+
+
     public abstract class Session
     {
         Socket m_socket;

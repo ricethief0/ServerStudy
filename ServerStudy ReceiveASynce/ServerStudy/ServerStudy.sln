@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DummyClient", "DummyClient\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerCore", "ServerCore\ServerCore.csproj", "{3E67C831-B65C-48EC-B79E-469E1FCACA8C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PacketGenerator", "PacketGenerator\PacketGenerator.csproj", "{4B597A81-96A5-4899-B51B-EF8A7473978D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{253FABE7-24A0-4044-A68C-80F8D7889A24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,10 @@ Global
 		{3E67C831-B65C-48EC-B79E-469E1FCACA8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E67C831-B65C-48EC-B79E-469E1FCACA8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E67C831-B65C-48EC-B79E-469E1FCACA8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B597A81-96A5-4899-B51B-EF8A7473978D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B597A81-96A5-4899-B51B-EF8A7473978D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B597A81-96A5-4899-B51B-EF8A7473978D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B597A81-96A5-4899-B51B-EF8A7473978D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -40,5 +48,8 @@ Global
 		$1.DirectoryNamespaceAssociation = PrefixedHierarchical
 		$0.StandardHeader = $2
 		$0.VersionControlPolicy = $3
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4B597A81-96A5-4899-B51B-EF8A7473978D} = {253FABE7-24A0-4044-A68C-80F8D7889A24}
 	EndGlobalSection
 EndGlobal

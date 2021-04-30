@@ -7,37 +7,7 @@ using ServerCore;
 
 namespace DummyClient
 {
-    public class GameSession : Session
-    {
-        public override void OnConnected(EndPoint endPoint)
-        {
-            Console.WriteLine($"OnConnected : {endPoint}");
-            // 보내기 위함
-            for (int i = 0; i < 5; i++)
-            {
-                Send(Encoding.UTF8.GetBytes($"I'm Client what are you name? {i.ToString("D2")}"));
-            }
-        }
-
-        public override void OnDisConnected(EndPoint endPoint)
-        {
-            Console.WriteLine($"OnDisConnected : {endPoint}");
-        }
-
-        public override int OnReceive(ArraySegment<byte> buffers)
-        {
-            string recData = Encoding.UTF8.GetString(buffers.Array, buffers.Offset, buffers.Count);
-
-            Console.WriteLine($"[From Server] : {recData}");
-            return buffers.Count;
-        }
-
-
-        public override void OnSend(int numOfBytes)
-        {
-            Console.WriteLine($"Send Transferred bytes : {numOfBytes}");
-        }
-    }
+    
 
     class Program
     {
@@ -50,7 +20,7 @@ namespace DummyClient
 
             Connector connector = new Connector();
 
-            connector.Connect(endPoint, () => { return new GameSession(); });
+            connector.Connect(endPoint, () => { return new ServerSession(); });
 
 
             while(true)
