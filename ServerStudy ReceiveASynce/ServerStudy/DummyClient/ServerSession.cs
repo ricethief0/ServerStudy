@@ -15,20 +15,20 @@ namespace DummyClient
         {
             Console.WriteLine($"OnConnected : {endPoint}");
 
-            PlayerInfoReq packet = new PlayerInfoReq() {playerId = 1001, name = "ABCD"};
-            packet.skills.Add(new PlayerInfoReq.Skill() { id = 101, level = 50, duration = 3.4f });
-            packet.skills.Add(new PlayerInfoReq.Skill() { id = 102, level = 30, duration = 2.4f });
-            packet.skills.Add(new PlayerInfoReq.Skill() { id = 103, level = 10, duration = 4.4f });
-            packet.skills.Add(new PlayerInfoReq.Skill() { id = 104, level = 5, duration = 1.4f });
-            // 보내기 위함
-            //for (int i = 0; i < 5; i++)
-            {
-                ArraySegment<byte> sg = packet.Write();
+            //C_Chat packet = new C_Chat() {playerId = 1001, name = "ABCD"};
+            //packet.skills.Add(new C_PlayerInfoReq.Skill() { id = 101, level = 50, duration = 3.4f });
+            //packet.skills.Add(new C_PlayerInfoReq.Skill() { id = 102, level = 30, duration = 2.4f });
+            //packet.skills.Add(new C_PlayerInfoReq.Skill() { id = 103, level = 10, duration = 4.4f });
+            //packet.skills.Add(new C_PlayerInfoReq.Skill() { id = 104, level = 5, duration = 1.4f });
+            //// 보내기 위함
+            ////for (int i = 0; i < 5; i++)
+            //{
+            //    ArraySegment<byte> sg = packet.Write();
 
-                if (sg != null)
-                    Send(sg);
+            //    if (sg != null)
+            //        Send(sg);
 
-            }
+            //}
         }
 
         public override void OnDisConnected(EndPoint endPoint)

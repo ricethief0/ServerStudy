@@ -7,50 +7,24 @@ using ServerCore;
 
 public enum PacketID
 {
-    PlayerInfoReq = 1,
-	Test = 2,
+    C_Chat = 1,
+	S_Chat = 2,
 	
 }
 
-
-public class PlayerInfoReq  //body
+interface IPacket
 {
-    public byte testByte;
-	public long playerId;
-	public string name;
-	
-	public class Skill
-	{
-	    public int id;
-		public short level;
-		public float duration;
-	
-	    public void Read(ReadOnlySpan<byte> span, ref ushort count)
-	    {
-	        this.id = BitConverter.ToInt32(span.Slice(count,span.Length-count));
-			    count += sizeof(int); 
-			this.level = BitConverter.ToInt16(span.Slice(count,span.Length-count));
-			    count += sizeof(short); 
-			this.duration = BitConverter.ToSingle(span.Slice(count,span.Length-count));
-			    count += sizeof(float); 
-	    }
-	    public bool Write(Span<byte> span, ref ushort count)
-	    {
-	        bool success = true;
-	        success &= BitConverter.TryWriteBytes(span.Slice(count,span.Length-count), this.id);
-			count += sizeof(int);
-			success &= BitConverter.TryWriteBytes(span.Slice(count,span.Length-count), this.level);
-			count += sizeof(short);
-			success &= BitConverter.TryWriteBytes(span.Slice(count,span.Length-count), this.duration);
-			count += sizeof(float);
-	        return success;
-	    }
-	}
-	
-	public List<Skill> skills = new List<Skill>();
-	
-	
+	ushort Protocol { get; }
+	void Read(ArraySegment<byte> se);
+	ArraySegment<byte> Write();
+}
 
+
+class C_Chat :IPacket
+{
+    public string chat;
+
+    public ushort Protocol { get { return (ushort)PacketID.C_Chat; } }
     public  void Read(ArraySegment<byte> sg)
     {
 
@@ -63,24 +37,11 @@ public class PlayerInfoReq  //body
         //ushort id = BitConverter.ToUInt16(sg.Array, sg.Offset + count);
         count += sizeof(ushort);
 
-        this.testByte = (byte)sg.Array[sg.Offset + count];
-		count += sizeof(byte);
-		this.playerId = BitConverter.ToInt64(span.Slice(count,span.Length-count));
-		    count += sizeof(long); 
-		ushort nameLen = BitConverter.ToUInt16(span.Slice(count, span.Length - count));
+        ushort chatLen = BitConverter.ToUInt16(span.Slice(count, span.Length - count));
 		count += sizeof(ushort);
-		name = Encoding.Unicode.GetString(span.Slice(count, nameLen));
-		count += nameLen;
+		chat = Encoding.Unicode.GetString(span.Slice(count, chatLen));
+		count += chatLen;
 		
-		skills.Clear();
-		ushort skillLen = (ushort)BitConverter.ToInt16(span.Slice(count, span.Length - count));
-		count += sizeof(ushort);
-		for (int i = 0; i < skillLen; i++)
-		{
-		    Skill skill = new Skill();
-		    skill.Read(span, ref count);
-		    skills.Add(skill);
-		}
             
 
     }
@@ -94,20 +55,12 @@ public class PlayerInfoReq  //body
         Span<byte> span = new Span<byte>(sg.Array, sg.Offset, sg.Count); // span을 만든 이유는 어차피 spawn을 인자로 써야하기때문에
 
         count += sizeof(ushort);
-        success &= BitConverter.TryWriteBytes(span.Slice(count,span.Length-count), (ushort)PacketID.PlayerInfoReq); // 시작범위부터 남은공간까지 오른쪽에 인자 값을 넣어라
+        success &= BitConverter.TryWriteBytes(span.Slice(count,span.Length-count), (ushort)PacketID.C_Chat); // 시작범위부터 남은공간까지 오른쪽에 인자 값을 넣어라
         count += sizeof(ushort);
-        sg.Array[sg.Offset + count] = (byte)this.testByte;
-		count += sizeof(byte);
-		success &= BitConverter.TryWriteBytes(span.Slice(count,span.Length-count), this.playerId);
-		count += sizeof(long);
-		ushort nameLen = (ushort)Encoding.Unicode.GetBytes(this.name, 0, this.name.Length, sg.Array, sg.Offset + count+sizeof(ushort));
-		success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), nameLen);
+        ushort chatLen = (ushort)Encoding.Unicode.GetBytes(this.chat, 0, this.chat.Length, sg.Array, sg.Offset + count+sizeof(ushort));
+		success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), chatLen);
 		count += sizeof(ushort);
-		count += nameLen;
-		success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), (ushort)this.skills.Count);
-		count += sizeof(ushort);
-		foreach (Skill skill in this.skills)
-		    success &= skill.Write(span, ref count);
+		count += chatLen;
         success &= BitConverter.TryWriteBytes(span, count);
         if (success == false)
             return null;
@@ -116,10 +69,12 @@ public class PlayerInfoReq  //body
     }
 }
 
-public class Test  //body
+class S_Chat :IPacket
 {
-    public int testInt;
+    public int playerId;
+	public string chat;
 
+    public ushort Protocol { get { return (ushort)PacketID.S_Chat; } }
     public  void Read(ArraySegment<byte> sg)
     {
 
@@ -132,8 +87,13 @@ public class Test  //body
         //ushort id = BitConverter.ToUInt16(sg.Array, sg.Offset + count);
         count += sizeof(ushort);
 
-        this.testInt = BitConverter.ToInt32(span.Slice(count,span.Length-count));
+        this.playerId = BitConverter.ToInt32(span.Slice(count,span.Length-count));
 		    count += sizeof(int); 
+		ushort chatLen = BitConverter.ToUInt16(span.Slice(count, span.Length - count));
+		count += sizeof(ushort);
+		chat = Encoding.Unicode.GetString(span.Slice(count, chatLen));
+		count += chatLen;
+		
             
 
     }
@@ -147,10 +107,14 @@ public class Test  //body
         Span<byte> span = new Span<byte>(sg.Array, sg.Offset, sg.Count); // span을 만든 이유는 어차피 spawn을 인자로 써야하기때문에
 
         count += sizeof(ushort);
-        success &= BitConverter.TryWriteBytes(span.Slice(count,span.Length-count), (ushort)PacketID.Test); // 시작범위부터 남은공간까지 오른쪽에 인자 값을 넣어라
+        success &= BitConverter.TryWriteBytes(span.Slice(count,span.Length-count), (ushort)PacketID.S_Chat); // 시작범위부터 남은공간까지 오른쪽에 인자 값을 넣어라
         count += sizeof(ushort);
-        success &= BitConverter.TryWriteBytes(span.Slice(count,span.Length-count), this.testInt);
+        success &= BitConverter.TryWriteBytes(span.Slice(count,span.Length-count), this.playerId);
 		count += sizeof(int);
+		ushort chatLen = (ushort)Encoding.Unicode.GetBytes(this.chat, 0, this.chat.Length, sg.Array, sg.Offset + count+sizeof(ushort));
+		success &= BitConverter.TryWriteBytes(span.Slice(count, span.Length - count), chatLen);
+		count += sizeof(ushort);
+		count += chatLen;
         success &= BitConverter.TryWriteBytes(span, count);
         if (success == false)
             return null;
