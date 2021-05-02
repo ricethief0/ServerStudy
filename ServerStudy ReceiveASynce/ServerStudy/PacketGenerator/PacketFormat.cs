@@ -13,17 +13,12 @@ using System.Collections.Generic;
 class PacketManager
 {{
     #region singleton
-    static PacketManager m_instance;
-    public static PacketManager instance
-    {{
-        get
-        {{
-            if (m_instance == null)
-                    m_instance = new PacketManager();
-            return m_instance;
-        }}
-    }}
+    static PacketManager m_instance = new PacketManager();
+    public static PacketManager Instance {{ get {{ return m_instance; }} }}
+
     #endregion
+
+    PacketManager() {{ Register(); }}
 
     Dictionary<ushort, Action<PacketSession, ArraySegment<byte>>> m_onRecv = new Dictionary<ushort, Action<PacketSession, ArraySegment<byte>>>();
     Dictionary<ushort, Action<PacketSession, IPacket>> m_handler = new Dictionary<ushort, Action<PacketSession, IPacket>>();

@@ -20,7 +20,7 @@ namespace DummyClient
 
             Connector connector = new Connector();
 
-            connector.Connect(endPoint, () => { return new ServerSession(); });
+            connector.Connect(endPoint, () => { return SessionManager.Instance.Generate(); },10); // 클라이언트 접속자를 만들수있음.
 
 
             while(true)
@@ -28,14 +28,14 @@ namespace DummyClient
                 Socket socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp); //  tcp형태의 소켓을 생성
                 try
                 {
-                    
+                    SessionManager.Instance.SendForEach();
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.ToString());
                 }
 
-                Thread.Sleep(100);              
+                Thread.Sleep(250);           //1초에 4번 보내기위해 만든것
             }
           
             

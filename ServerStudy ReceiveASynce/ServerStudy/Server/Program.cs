@@ -15,7 +15,7 @@ namespace Server
 
         static void Main(string[] args)
         {
-            PacketManager.instance.Register();
+            
 
             //DNS(Domain Name System)
             string host = Dns.GetHostName(); // dns를 받아옴
