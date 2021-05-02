@@ -15,7 +15,7 @@ namespace ServerCore
         public sealed override int OnReceive(ArraySegment<byte> buffers)
         {
             int processLen = 0;
-
+            int packetCount = 0;
             while(true)
             {
                 //최소한 헤더는 파싱할수있는지 패킷사이즈로 확인
@@ -24,17 +24,18 @@ namespace ServerCore
 
                 //패킷이 완전체로 도착했는지 확인 
                 ushort dataSize = BitConverter.ToUInt16(buffers.Array, buffers.Offset);
-                if (buffers.Count > dataSize) // 패킷사이즈가 실제 들어온 버퍼 사이즈보다 작으면 말이 안되니 브레이크
+                if (buffers.Count < dataSize) // 실제 버퍼가 적혀온 사이즈보다 작으면 말이 완전체가 아니니 브레이크
                     break;
 
                 //패킷조립가능
                 OnRecvPacket(buffers);
-
+                packetCount++;
                 processLen += dataSize;
                 buffers = new ArraySegment<byte>(buffers.Array, buffers.Offset + dataSize, buffers.Count - dataSize);
 
             }
-
+            if(packetCount >1)
+                Console.WriteLine($"패킷 모아보내기 : {packetCount}");
             return processLen;
         }
 
@@ -49,7 +50,8 @@ namespace ServerCore
     {
         Socket m_socket;
         int mutex = 0;
-        RecvBuffer m_recvBuffer = new RecvBuffer(1024);
+
+        RecvBuffer m_recvBuffer = new RecvBuffer(65535);
 
 
         Queue<ArraySegment<byte>> sendQue = new Queue<ArraySegment<byte>>();
@@ -130,10 +132,11 @@ namespace ServerCore
                 ArraySegment<byte> buff = sendQue.Dequeue();
                 m_penddingList.Add(buff);
             }
+            
+            m_sendArgs.BufferList = m_penddingList;
+
             try
             {
-                m_sendArgs.BufferList = m_penddingList;
-
                 bool pending = m_socket.SendAsync(m_sendArgs);
                 if (pending == false)
                 {

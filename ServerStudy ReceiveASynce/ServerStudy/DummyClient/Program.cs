@@ -20,12 +20,11 @@ namespace DummyClient
 
             Connector connector = new Connector();
 
-            connector.Connect(endPoint, () => { return SessionManager.Instance.Generate(); },100); // 클라이언트 접속자를 만들수있음.
+            connector.Connect(endPoint, () => { return SessionManager.Instance.Generate(); },500); // 클라이언트 접속자를 만들수있음.
 
 
             while(true)
             {
-                Socket socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp); //  tcp형태의 소켓을 생성
                 try
                 {
                     SessionManager.Instance.SendForEach();
