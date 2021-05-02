@@ -1,22 +1,24 @@
-﻿using System;
+﻿using ServerCore;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Server
 {
-    public class GameRoom
+    public class GameRoom :IJobQueue
     {
         List<ClientSession> sessions = new List<ClientSession>();
-        object m_lock = new object();
+        JobQueue m_jobQueue = new JobQueue();
+        List<ArraySegment<byte>> m_pendingList = new List<ArraySegment<byte>>();
+
+        public void Push(Action job)
+        {
+            m_jobQueue.Push(job);
+        }
         public void Enter(ClientSession session)
         {
-            lock(m_lock)
-            {
-                sessions.Add(session);
-                session.Room = this;
-            }
-            
-
+            sessions.Add(session);
+            session.Room = this;
         }
 
         public void Broadcast(ClientSession session, string chat)
@@ -26,21 +28,21 @@ namespace Server
             packet.chat = $"{chat} I am {packet.playerId}";
             ArraySegment<byte> segment = packet.Write();
 
-            lock(m_lock)
-            {
-                foreach(ClientSession s in sessions)
-                {
-                    s.Send(segment);
-                }    
-            }
+            m_pendingList.Add(segment);
+        }
+
+        public void Flush()
+        {
+            foreach (ClientSession s in sessions)
+                s.Send(m_pendingList);
+
+            Console.WriteLine($"Flushed {m_pendingList.Count} Items");
+            m_pendingList.Clear();
         }
 
         public void Leave(ClientSession session)
         {
-            lock (m_lock)
-            {
-                sessions.Remove(session); 
-            }
+            sessions.Remove(session); 
         }
     }
 }

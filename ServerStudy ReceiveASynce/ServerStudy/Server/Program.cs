@@ -26,7 +26,10 @@ namespace Server
             listener.Init(endPoint, () => { return SessionManager.Instance.Create(); });
             Console.WriteLine("Waiting...");
             while (true)
-            {; }
+            {
+                Room.Push(() => Room.Flush());
+                Thread.Sleep(250);
+            }
 
 
 

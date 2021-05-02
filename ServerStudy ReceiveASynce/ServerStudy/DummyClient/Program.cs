@@ -20,7 +20,7 @@ namespace DummyClient
 
             Connector connector = new Connector();
 
-            connector.Connect(endPoint, () => { return SessionManager.Instance.Generate(); },10); // 클라이언트 접속자를 만들수있음.
+            connector.Connect(endPoint, () => { return SessionManager.Instance.Generate(); },100); // 클라이언트 접속자를 만들수있음.
 
 
             while(true)
@@ -36,6 +36,7 @@ namespace DummyClient
                 }
 
                 Thread.Sleep(250);           //1초에 4번 보내기위해 만든것
+                
             }
           
             

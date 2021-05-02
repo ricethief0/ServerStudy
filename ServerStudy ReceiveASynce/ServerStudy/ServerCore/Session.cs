@@ -91,6 +91,22 @@ namespace ServerCore
             }
             
         }
+        public void Send(List<ArraySegment<byte>> sendBuffList)
+        {
+            if (sendBuffList.Count == 0) return;
+
+            lock (m_lock)
+            {
+                foreach(ArraySegment<byte> buff in sendBuffList)
+                    sendQue.Enqueue(buff);
+                
+                if (m_penddingList.Count == 0)
+                {
+                    RegisterSend();
+                }
+
+            }
+        }
 
         public void DisConnect()
         {
@@ -213,6 +229,7 @@ namespace ServerCore
                         DisConnect();
                         return;
                     }
+
                     RegisterRecev();
                 }
                 catch (Exception ex)

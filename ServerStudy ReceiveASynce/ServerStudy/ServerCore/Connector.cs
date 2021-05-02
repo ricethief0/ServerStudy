@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace ServerCore
 {
-    // 리스너와 반대개념 ! (클라이언트에서 주로 썻던 아이)
+    // 연결해주는 부분
     public class Connector // 필요한 이유 : 1. 서버도 분산처리를 해야할 때 다른 서버들과 통신하기 위해서는 필요하다. 즉, 서버끼리 통신하고자 할때도 필요하기 때문이다.
     {
         Func<Session> m_sessionFactory;
